@@ -19,7 +19,27 @@ const instructions = Platform.select({
 });
 
 export default class AppAndroid extends Component {
+constructor(props) {
+    super(props);
+
+    this.state = {
+        latitude: null,
+        longitude: null,
+        error:null,
+    };
+  }
     componentDidMount = async () => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            console.log(position);
+            this.setState({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                error: null,
+            });
+        },
+        (error) => this.setState({ error: error.message }),
+        { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
+        );
         const enabled = await firebase.messaging().hasPermission();
         if (enabled) {
             // user has permissions
@@ -42,10 +62,15 @@ export default class AppAndroid extends Component {
             // Get information about the notification that was opened
             const notification: Notification = notificationOpen.notification;
             if (notification.body!==undefined) {
-                alert(notification.body);
+                var message = 'Body FCM: ' + notification.body;
+                if (this.state.longitude !== null) {
+                    message = message + ' & Location: ' + JSON.stringify(this.state);
+                }
+                console.log(message);
+                alert(message);
             } else {
                 var seen = [];
-                alert(JSON.stringify(notification.data, function(key, val) {
+                var message = 'Body FCM: ' + JSON.stringify(notification.data, function(key, val) {
                     if (val != null && typeof val == "object") {
                         if (seen.indexOf(val) >= 0) {
                             return;
@@ -53,7 +78,12 @@ export default class AppAndroid extends Component {
                         seen.push(val);
                     }
                     return val;
-                }));
+                });
+                 if (this.state.longitude !== null) {
+                    message = message + ' & Location: ' + JSON.stringify(this.state);
+                }
+                console.log(message);
+                alert(message);
             }
             firebase.notifications().removeDeliveredNotification(notification.notificationId);
         }
@@ -79,77 +109,22 @@ export default class AppAndroid extends Component {
                 .android.setSmallIcon('ic_launcher');
             firebase.notifications()
                 .displayNotification(notification);
-            // if (Platform.OS === 'android') {
-            //
-            //     const localNotification = new firebase.notifications.Notification({
-            //         sound: 'default',
-            //         show_in_foreground: true,
-            //         show_in_background: true
-            //     })
-            //         .setNotificationId(notification.notificationId)
-            //         .setTitle(notification.title)
-            //         .setSubtitle(notification.subtitle)
-            //         .setBody(notification.body)
-            //         .setData(notification.data)
-            //         .android.setChannelId('test-channel') // e.g. the id you chose above
-            //         .android.setSmallIcon('ic_launcher') // create this icon in Android Studio
-            //         .android.setColor('#000000') // you can set a color here
-            //         .android.setPriority(firebase.notifications.Android.Priority.High);
-            //
-            //     firebase.notifications()
-            //         .displayNotification(localNotification)
-            //         .catch(err => console.error(err));
-            //
-            // } else if (Platform.OS === 'ios') {
-            //
-            //     const localNotification = new firebase.notifications.Notification()
-            //         .setNotificationId(notification.notificationId)
-            //         .setTitle(notification.title)
-            //         .setSubtitle(notification.subtitle)
-            //         .setBody(notification.body)
-            //         .setData(notification.data)
-            //         .ios.setBadge(notification.ios.badge);
-            //
-            //     firebase.notifications()
-            //         .displayNotification(localNotification)
-            //         .catch(err => console.error(err));
-            //
-            // }
         });
         this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen: NotificationOpen) => {
             // Get the action triggered by the notification being opened
             const action = notificationOpen.action;
             // Get information about the notification that was opened
             const notification: Notification = notificationOpen.notification;
-            // const notification = new firebase.notifications.Notification({
-            //     sound: 'default',
-            //     show_in_foreground: true,
-            //     show_in_background: true
-            // })
-            //     .setNotificationId(notificationOpen.notification.notificationId)
-            //     .setTitle(notificationOpen.notification.title)
-            //     .setSubtitle(notificationOpen.notification.subtitle)
-            //     .setBody(notificationOpen.notification.body)
-            //     .setData(notificationOpen.notification.data)
-            //     .android.setChannelId('test-channel') // e.g. the id you chose above
-            //     .android.setSmallIcon('ic_launcher') // create this icon in Android Studio
-            //     .android.setColor('#000000') // you can set a color here
-            //     .android.setPriority(firebase.notifications.Android.Priority.High);
             if (notification.body!==undefined) {
-                alert(notification.body);
-                // var seen = [];
-                // alert(JSON.stringify(notification.data, function(key, val) {
-                //     if (val != null && typeof val == "object") {
-                //         if (seen.indexOf(val) >= 0) {
-                //             return;
-                //         }
-                //         seen.push(val);
-                //     }
-                //     return val;
-                // }));
+                 var message = 'Body FCM: ' + notification.body;
+                if (this.state.longitude !== null) {
+                    message = message + ' & Location: ' + JSON.stringify(this.state);
+                }
+                console.log(message);
+                alert(message);
             } else {
                 var seen = [];
-                alert(JSON.stringify(notification.data, function(key, val) {
+                var message = 'Body FCM: ' + JSON.stringify(notification.data, function(key, val) {
                     if (val != null && typeof val == "object") {
                         if (seen.indexOf(val) >= 0) {
                             return;
@@ -157,7 +132,12 @@ export default class AppAndroid extends Component {
                         seen.push(val);
                     }
                     return val;
-                }));
+                });
+                 if (this.state.longitude !== null) {
+                    message = message + ' & Location: ' + JSON.stringify(this.state);
+                }
+                console.log(message);
+                alert(message);
             }
             firebase.notifications().removeDeliveredNotification(notification.notificationId);
         });
