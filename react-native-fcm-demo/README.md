@@ -3,7 +3,7 @@
 
 How to run:
 ```
-yarn
+yarn && 
 react-native run-android
 ```
 For now, the ios version is under contruction.
